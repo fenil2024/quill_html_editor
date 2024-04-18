@@ -556,7 +556,10 @@ class ToolBarState extends State<ToolBar> {
           message: toolbarItem.style.name,
           child: Padding(
             padding: _buttonPadding,
-            child: _fontSizeDD(),
+            child: SizedBox(
+              height: 40,
+              child: SizedBox(width: 90, child: _fontSizeDD()),
+            ),
           ),
         ));
       } else if (toolbarItem.style == ToolBarStyle.align) {
@@ -919,6 +922,7 @@ class ToolBarState extends State<ToolBar> {
 
   DropdownMenuItem<String> _getAlignDDItem(String type) {
     IconData icon = Icons.format_align_left;
+
     if (type == 'center') {
       icon = Icons.format_align_center;
     } else if (type == 'right') {

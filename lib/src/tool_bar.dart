@@ -256,6 +256,8 @@ class ToolBar extends StatefulWidget {
 
   final Color? unSelectdOptionTextColor;
 
+  final EdgeInsetsGeometry? optionsPadding;
+
   ///[ToolBar] widget to show the quill
   /// The toolbar items will be auto aligned based on the screen's width or height
   /// The behaviour of the widget's alignment is similar to [Wrap] widget
@@ -283,6 +285,7 @@ class ToolBar extends StatefulWidget {
     this.selectedOptionBackgoroundColor,
     this.unSelectdOptionTextColor,
     this.unSelectedOptionBackgoroundColor,
+    this.optionsPadding,
   })  : assert(
             crossAxisAlignment is WrapCrossAlignment, "Please pass WrapCrossAlignment, instead of CrossAxisAlignment"),
         mainAxisAlignment = MainAxisAlignment.start,
@@ -317,6 +320,7 @@ class ToolBar extends StatefulWidget {
     this.selectedOptionBackgoroundColor,
     this.unSelectdOptionTextColor,
     this.unSelectedOptionBackgoroundColor,
+    this.optionsPadding,
   })  : assert(
             crossAxisAlignment is CrossAxisAlignment, "Please pass CrossAxisAlignment, instead of WrapCrossAlignment"),
         spacing = 0.0,
@@ -337,7 +341,7 @@ class ToolBarState extends State<ToolBar> {
   late GlobalKey<ElTooltipState> _fontBgColorKey;
   late GlobalKey<ElTooltipState> _fontColorKey;
   late GlobalKey<ElTooltipState> _tablePickerKey;
-  EdgeInsetsGeometry _buttonPadding = const EdgeInsets.all(6);
+  late EdgeInsetsGeometry _buttonPadding;
 
   @override
   void initState() {
@@ -346,7 +350,7 @@ class ToolBarState extends State<ToolBar> {
     _tablePickerKey = GlobalKey<ElTooltipState>(debugLabel: '_tablePickerKey${widget.controller.hashCode.toString()}');
 
     if (widget.padding != null) {
-      _buttonPadding = widget.padding!;
+      _buttonPadding = widget.optionsPadding ?? const EdgeInsets.all(6);
     }
     if (widget.toolBarConfig == null || widget.toolBarConfig!.isEmpty) {
       for (var style in ToolBarStyle.values) {
@@ -361,6 +365,7 @@ class ToolBarState extends State<ToolBar> {
           style: style,
           isActive: false,
           padding: _buttonPadding,
+          optionsPadding: null,
         ));
       }
     } else {
@@ -380,6 +385,8 @@ class ToolBarState extends State<ToolBar> {
     }
     super.initState();
   }
+
+  IconData selectedIcon = Icons.format_align_left;
 
   @override
   Widget build(BuildContext context) {
@@ -545,90 +552,112 @@ class ToolBarState extends State<ToolBar> {
       var toolbarItem = _toolbarList[i];
       if (toolbarItem.style == ToolBarStyle.size) {
         tempToolBarList.add(Tooltip(
-            waitDuration: const Duration(milliseconds: 800),
-            message: toolbarItem.style.name,
-            child: Padding(
-              padding: _buttonPadding,
-              child: _fontSizeDD(),
-            )));
+          waitDuration: const Duration(milliseconds: 800),
+          message: toolbarItem.style.name,
+          child: Padding(
+            padding: _buttonPadding,
+            child: _fontSizeDD(),
+          ),
+        ));
       } else if (toolbarItem.style == ToolBarStyle.align) {
-        tempToolBarList.add(Tooltip(
+        tempToolBarList.add(
+          Tooltip(
             waitDuration: const Duration(milliseconds: 800),
             message: toolbarItem.style.name,
             child: Padding(
               padding: _buttonPadding,
-              child: SizedBox(width: widget.iconSize, height: widget.iconSize, child: _alignDD()),
-            )));
+              child: SizedBox(
+                height: 40,
+                child: _alignDD(),
+              ),
+            ),
+          ),
+        );
       } else if (toolbarItem.style == ToolBarStyle.color) {
         tempToolBarList.add(Tooltip(
-            waitDuration: const Duration(milliseconds: 800),
-            message: toolbarItem.style.name,
-            child: Padding(
-              padding: _buttonPadding,
-              child: SizedBox(width: widget.iconSize, height: widget.iconSize, child: _getFontColorWidget(i)),
-            )));
+          waitDuration: const Duration(milliseconds: 800),
+          message: toolbarItem.style.name,
+          child: Padding(
+            padding: _buttonPadding,
+            child: _getFontColorWidget(i),
+          ),
+        ));
       } else if (toolbarItem.style == ToolBarStyle.video) {
         tempToolBarList.add(Tooltip(
-            waitDuration: const Duration(milliseconds: 800),
-            message: toolbarItem.style.name,
-            child: Padding(
-              padding: _buttonPadding,
-              child: InputUrlWidget(
-                iconWidget: SizedBox(
-                  width: widget.iconSize! - 2,
-                  height: widget.iconSize! - 2,
-                  child: Image.asset(
-                    ImageConstant.kiCameraRollPng,
-                    color: widget.iconColor,
-                  ),
+          waitDuration: const Duration(milliseconds: 800),
+          message: toolbarItem.style.name,
+          child: Padding(
+            padding: _buttonPadding,
+            child: InputUrlWidget(
+              iconWidget: SizedBox(
+                width: widget.iconSize! - 2,
+                height: widget.iconSize! - 2,
+                child: Image.asset(
+                  ImageConstant.kiCameraRollPng,
+                  color: widget.iconColor,
                 ),
-                isActive: _formatMap['video'] != null,
-                controller: widget.controller,
-                type: UrlInputType.video,
-                onSubmit: (v) {
-                  widget.controller.embedVideo(v);
-                },
               ),
-            )));
+              isActive: _formatMap['video'] != null,
+              controller: widget.controller,
+              type: UrlInputType.video,
+              onSubmit: (v) {
+                widget.controller.embedVideo(v);
+              },
+            ),
+          ),
+        ));
       } else if (toolbarItem.style == ToolBarStyle.link) {
         tempToolBarList.add(Tooltip(
-            waitDuration: const Duration(milliseconds: 800),
-            message: toolbarItem.style.name,
-            child: Padding(
-              padding: _buttonPadding,
-              child: InputUrlWidget(
-                iconWidget: Icon(
-                  Icons.link,
-                  color: widget.iconColor,
-                  size: widget.iconSize,
-                ),
-                isActive: _formatMap['link'] != null,
-                controller: widget.controller,
-                type: UrlInputType.hyperlink,
-                onSubmit: (v) {
-                  widget.controller.setFormat(format: 'link', value: v);
-                },
+          waitDuration: const Duration(milliseconds: 800),
+          message: toolbarItem.style.name,
+          child: Padding(
+            padding: _buttonPadding,
+            child: InputUrlWidget(
+              iconWidget: Icon(
+                Icons.link,
+                color: widget.iconColor,
+                size: widget.iconSize,
               ),
-            )));
+              isActive: _formatMap['link'] != null,
+              controller: widget.controller,
+              type: UrlInputType.hyperlink,
+              onSubmit: (v) {
+                widget.controller.setFormat(format: 'link', value: v);
+              },
+            ),
+          ),
+        ));
       } else if (toolbarItem.style == ToolBarStyle.background) {
         tempToolBarList.add(Tooltip(
-            waitDuration: const Duration(milliseconds: 800),
-            message: toolbarItem.style.name,
-            child: Padding(
-              padding: _buttonPadding,
-              child: SizedBox(width: widget.iconSize, height: widget.iconSize, child: _getFontBackgroundColorWidget(i)),
-            )));
+          waitDuration: const Duration(milliseconds: 800),
+          message: toolbarItem.style.name,
+          child: Padding(
+            padding: _buttonPadding,
+            child: SizedBox(
+              width: 30,
+              height: 40,
+              child: _getFontBackgroundColorWidget(i),
+            ),
+          ),
+        ));
       } else if (toolbarItem.style == ToolBarStyle.addTable) {
-        tempToolBarList.add(Tooltip(
+        tempToolBarList.add(
+          Tooltip(
             waitDuration: const Duration(milliseconds: 800),
             message: toolbarItem.style.name,
             child: Padding(
               padding: _buttonPadding,
-              child:
-                  SizedBox(width: widget.iconSize, height: widget.iconSize, child: _getTablePickerWidget(i, context)),
-            )));
+              child: SizedBox(
+                width: widget.iconSize,
+                height: widget.iconSize,
+                child: _getTablePickerWidget(i, context),
+              ),
+            ),
+          ),
+        );
       } else if (toolbarItem.style == ToolBarStyle.editTable) {
-        tempToolBarList.add(Tooltip(
+        tempToolBarList.add(
+          Tooltip(
             waitDuration: const Duration(milliseconds: 800),
             message: toolbarItem.style.name,
             child: EditTableDropDown(
@@ -637,10 +666,13 @@ class ToolBarState extends State<ToolBar> {
               iconSize: widget.iconSize!,
               dropDownColor: widget.toolBarColor!,
               onOptionSelected: (type) => widget.controller.modifyTable(type),
-            )));
+            ),
+          ),
+        );
       } else if (toolbarItem.style == ToolBarStyle.separator) {
         if (widget.direction == Axis.horizontal) {
-          tempToolBarList.add(Tooltip(
+          tempToolBarList.add(
+            Tooltip(
               waitDuration: const Duration(milliseconds: 800),
               message: toolbarItem.style.name,
               child: Padding(
@@ -650,9 +682,12 @@ class ToolBarState extends State<ToolBar> {
                   width: 0.8,
                   color: widget.iconColor,
                 ),
-              )));
+              ),
+            ),
+          );
         } else {
-          tempToolBarList.add(Tooltip(
+          tempToolBarList.add(
+            Tooltip(
               waitDuration: const Duration(milliseconds: 800),
               message: toolbarItem.style.name,
               child: Padding(
@@ -662,68 +697,71 @@ class ToolBarState extends State<ToolBar> {
                   height: 0.8,
                   color: widget.iconColor,
                 ),
-              )));
+              ),
+            ),
+          );
         }
       } else {
         tempToolBarList.add(Tooltip(
-            waitDuration: const Duration(milliseconds: 800),
-            message: toolbarItem.style.name,
-            child: ToolBarItem(
-              selectdOptionTextColor: widget.selectdOptionTextColor,
-              selectedOptionBackgoroundColor: widget.selectedOptionBackgoroundColor,
-              unSelectdOptionTextColor: widget.unSelectdOptionTextColor,
-              unSelectedOptionBackgoroundColor: widget.unSelectedOptionBackgoroundColor,
-              activeIconColor: widget.activeIconColor!,
-              iconColor: widget.iconColor!,
-              iconSize: widget.iconSize!,
-              padding: _buttonPadding,
-              style: toolbarItem.style,
-              isActive: toolbarItem.isActive,
-              onTap: () async {
-                if (toolbarItem.style == ToolBarStyle.clearHistory) {
-                  widget.controller.clearHistory();
-                } else if (toolbarItem.style == ToolBarStyle.undo) {
-                  widget.controller.undo();
-                } else if (toolbarItem.style == ToolBarStyle.redo) {
-                  widget.controller.redo();
-                } else if (toolbarItem.style == ToolBarStyle.image) {
-                  await ImageSelector(onImagePicked: (value) {
-                    _formatMap['image'] = value;
-                    widget.controller.embedImage(value);
-                  }).pickFiles();
-                } else if (toolbarItem.style == ToolBarStyle.clean) {
-                  List<ToolBarItem> tempList = [];
-                  for (var value in _toolbarList) {
-                    value = value.copyWith(isActive: false);
-                    tempList.add(value);
-                  }
-                  _toolbarList = tempList;
-                } else if (toolbarItem.style == ToolBarStyle.headerOne) {
-                  for (var element in _toolbarList) {
-                    if (element.style == ToolBarStyle.headerTwo) {
-                      element = element.copyWith(isActive: false);
-                    }
-                  }
-                  toolbarItem = toolbarItem.copyWith(isActive: !toolbarItem.isActive);
-                } else if (toolbarItem.style == ToolBarStyle.headerTwo) {
-                  for (var element in _toolbarList) {
-                    if (element.style == ToolBarStyle.headerOne) {
-                      element = element.copyWith(isActive: false);
-                    }
-                  }
-                  toolbarItem = toolbarItem.copyWith(isActive: !toolbarItem.isActive);
-                } else {
-                  toolbarItem = toolbarItem.copyWith(isActive: !toolbarItem.isActive);
+          waitDuration: const Duration(milliseconds: 800),
+          message: toolbarItem.style.name,
+          child: ToolBarItem(
+            selectdOptionTextColor: widget.selectdOptionTextColor,
+            selectedOptionBackgoroundColor: widget.selectedOptionBackgoroundColor,
+            unSelectdOptionTextColor: widget.unSelectdOptionTextColor,
+            unSelectedOptionBackgoroundColor: widget.unSelectedOptionBackgoroundColor,
+            activeIconColor: widget.activeIconColor!,
+            iconColor: widget.iconColor!,
+            iconSize: widget.iconSize!,
+            padding: _buttonPadding,
+            style: toolbarItem.style,
+            isActive: toolbarItem.isActive,
+            onTap: () async {
+              if (toolbarItem.style == ToolBarStyle.clearHistory) {
+                widget.controller.clearHistory();
+              } else if (toolbarItem.style == ToolBarStyle.undo) {
+                widget.controller.undo();
+              } else if (toolbarItem.style == ToolBarStyle.redo) {
+                widget.controller.redo();
+              } else if (toolbarItem.style == ToolBarStyle.image) {
+                await ImageSelector(onImagePicked: (value) {
+                  _formatMap['image'] = value;
+                  widget.controller.embedImage(value);
+                }).pickFiles();
+              } else if (toolbarItem.style == ToolBarStyle.clean) {
+                List<ToolBarItem> tempList = [];
+                for (var value in _toolbarList) {
+                  value = value.copyWith(isActive: false);
+                  tempList.add(value);
                 }
-                Map<String, dynamic> getFormat = _getFormatByStyle(toolbarItem.style, toolbarItem.isActive);
-                widget.controller.setFormat(format: getFormat['format'], value: getFormat['value']);
+                _toolbarList = tempList;
+              } else if (toolbarItem.style == ToolBarStyle.headerOne) {
+                for (var element in _toolbarList) {
+                  if (element.style == ToolBarStyle.headerTwo) {
+                    element = element.copyWith(isActive: false);
+                  }
+                }
+                toolbarItem = toolbarItem.copyWith(isActive: !toolbarItem.isActive);
+              } else if (toolbarItem.style == ToolBarStyle.headerTwo) {
+                for (var element in _toolbarList) {
+                  if (element.style == ToolBarStyle.headerOne) {
+                    element = element.copyWith(isActive: false);
+                  }
+                }
+                toolbarItem = toolbarItem.copyWith(isActive: !toolbarItem.isActive);
+              } else {
+                toolbarItem = toolbarItem.copyWith(isActive: !toolbarItem.isActive);
+              }
+              Map<String, dynamic> getFormat = _getFormatByStyle(toolbarItem.style, toolbarItem.isActive);
+              widget.controller.setFormat(format: getFormat['format'], value: getFormat['value']);
 
-                if (_formatMap['direction'] == 'rtl') {
-                  widget.controller.setFormat(format: 'align', value: 'right');
-                }
-                setState(() {});
-              },
-            )));
+              if (_formatMap['direction'] == 'rtl') {
+                widget.controller.setFormat(format: 'align', value: 'right');
+              }
+              setState(() {});
+            },
+          ),
+        ));
       }
     }
     if (widget.customButtons != null && widget.customButtons!.isNotEmpty) {
@@ -859,9 +897,7 @@ class ToolBarState extends State<ToolBar> {
         padding: EdgeInsets.zero,
         child: DropdownButton<String>(
             dropdownColor: widget.toolBarColor,
-            icon: const SizedBox(
-              width: 0,
-            ),
+            icon: const SizedBox(width: 0),
             focusColor: Colors.transparent,
             alignment: Alignment.bottomCenter,
             isDense: true,
@@ -890,6 +926,7 @@ class ToolBarState extends State<ToolBar> {
     } else if (type == 'justify') {
       icon = Icons.format_align_justify;
     }
+
     return DropdownMenuItem<String>(
       value: type,
       child: WebViewAware(
@@ -925,20 +962,20 @@ class ToolBarState extends State<ToolBar> {
         color: Colors.transparent,
         child: SizedBox(
           width: widget.iconSize,
-          height: widget.iconSize,
+          height: 40,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: Text(
-                  'A',
-                  maxLines: 1,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: _formatMap['color'] != null ? widget.activeIconColor : widget.iconColor,
-                      fontSize: widget.iconSize! - 5),
+              Text(
+                'A',
+                maxLines: 1,
+                style: TextStyle(
+                  height: 1.1,
+                  fontWeight: FontWeight.bold,
+                  color: _formatMap['color'] != null ? widget.activeIconColor : widget.iconColor,
+                  fontSize: widget.iconSize! - 5,
                 ),
               ),
               Container(
@@ -977,21 +1014,22 @@ class ToolBarState extends State<ToolBar> {
         color: Colors.transparent,
         child: Container(
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            border: Border.all(width: 0.1),
-            color: _formatMap['background'] != null ? HexColor.fromHex(_formatMap['background']) : Colors.transparent,
-          ),
-          height: widget.iconSize,
-          width: widget.iconSize,
-          child: FittedBox(
-            fit: BoxFit.fitHeight,
+          child: Container(
+            height: 30,
+            width: 30,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: _formatMap['background'] != null ? HexColor.fromHex(_formatMap['background']) : Colors.transparent,
+            ),
             child: Text(
               'A',
               maxLines: 1,
               style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: _formatMap['background'] != null ? widget.activeIconColor : widget.iconColor,
-                  fontSize: widget.iconSize! - 1),
+                fontWeight: FontWeight.w600,
+                color: _formatMap['background'] != null ? widget.activeIconColor : widget.iconColor,
+                fontSize: 20,
+              ),
             ),
           ),
         ),
@@ -1003,9 +1041,9 @@ class ToolBarState extends State<ToolBar> {
     return ElTooltip(
       color: widget.toolBarColor!,
       distance: 0,
-      onTap: () {
+      onTap: () async {
         if (MediaQuery.of(context).size.width < 480) {
-          _showTablePickerDialog(context);
+          await _showTablePickerDialog(context);
         } else {
           if (_tablePickerKey.currentState != null) {
             _tablePickerKey.currentState!.showOverlayOnTap();
@@ -1035,8 +1073,8 @@ class ToolBarState extends State<ToolBar> {
     );
   }
 
-  void _showTablePickerDialog(BuildContext context) {
-    showDialog(
+  Future<void> _showTablePickerDialog(BuildContext context) async {
+    await showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -1121,6 +1159,8 @@ class ToolBarItem extends StatelessWidget {
 
   final Color? unSelectdOptionTextColor;
 
+  final EdgeInsetsGeometry? optionsPadding;
+
   ///[ToolBarItem] toolbaritem widget to show buttons based on style
   const ToolBarItem({
     super.key,
@@ -1128,6 +1168,7 @@ class ToolBarItem extends StatelessWidget {
     required this.isActive,
     required this.padding,
     required this.iconSize,
+    this.optionsPadding,
     required this.iconColor,
     required this.activeIconColor,
     this.selectdOptionTextColor,
@@ -1167,10 +1208,8 @@ class ToolBarItem extends StatelessWidget {
       case ToolBarStyle.codeBlock:
         return _getIconWidget(Icons.code_sharp);
       case ToolBarStyle.indentAdd:
-        //isActive = false;
         return _getIconWidget(Icons.format_indent_increase_sharp);
       case ToolBarStyle.indentMinus:
-        //  isActive = false;
         return _getIconWidget(Icons.format_indent_decrease_sharp);
       case ToolBarStyle.directionRtl:
         return _getIconWidget(Icons.format_textdirection_r_to_l_sharp);
@@ -1221,12 +1260,17 @@ class ToolBarItem extends StatelessWidget {
         ),
       );
 
-  Widget _getAssetImageWidget(String imagePath) => SizedBox(
-        width: iconSize,
-        height: iconSize,
-        child: Image.asset(
-          imagePath,
-          color: isActive ? activeIconColor : iconColor,
+  Widget _getAssetImageWidget(String imagePath) => CircleAvatar(
+        backgroundColor: isActive
+            ? selectedOptionBackgoroundColor ?? Colors.black
+            : unSelectedOptionBackgoroundColor ?? Colors.transparent,
+        child: SizedBox(
+          width: iconSize,
+          height: iconSize,
+          child: Image.asset(
+            imagePath,
+            color: isActive ? selectdOptionTextColor ?? Colors.white : unSelectdOptionTextColor ?? Colors.black,
+          ),
         ),
       );
 

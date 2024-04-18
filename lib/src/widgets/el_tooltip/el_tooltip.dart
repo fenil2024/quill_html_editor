@@ -105,8 +105,7 @@ class ElTooltipState extends State<ElTooltip> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _widgetKey = GlobalKey(debugLabel: widget.key.toString());
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _loadHiddenOverlay(context));
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadHiddenOverlay(context));
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -133,8 +132,7 @@ class ElTooltipState extends State<ElTooltip> with WidgetsBindingObserver {
     _overlayStateHidden = Overlay.of(context);
     _overlayEntryHidden = OverlayEntry(
       builder: (context) {
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => _getHiddenOverlaySize(context));
+        WidgetsBinding.instance.addPostFrameCallback((_) => _getHiddenOverlaySize(context));
         return Opacity(
           opacity: 0,
           child: Center(
@@ -251,8 +249,7 @@ class ElTooltipState extends State<ElTooltip> with WidgetsBindingObserver {
 
     // Add timeout for the tooltip to disappear after a few seconds
     if (widget.timeout > 0) {
-      await Future.delayed(Duration(seconds: widget.timeout))
-          .whenComplete(() => hideOverlay());
+      await Future.delayed(Duration(seconds: widget.timeout)).whenComplete(() => hideOverlay());
     }
   }
 
@@ -277,8 +274,7 @@ class ElTooltipState extends State<ElTooltip> with WidgetsBindingObserver {
     if (widget.enable) {
       _overlayEntry != null ? hideOverlay() : _showOverlay(context);
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(widget.error)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(widget.error)));
     }
   }
 }

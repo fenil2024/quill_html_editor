@@ -233,13 +233,15 @@ class QuillHtmlEditorState extends State<QuillHtmlEditor> {
           initialSourceType: SourceType.html,
           height: _currentHeight,
           onPageStarted: (s) {
-            _editorLoaded = false;
+            Future.delayed(const Duration(seconds: 1)).then((value) {
+              _editorLoaded = false;
+            });
           },
           ignoreAllGestures: false,
           width: width,
           onWebViewCreated: (controller) => _webviewController = controller,
           onPageFinished: (src) {
-            Future.delayed(const Duration(seconds: 2)).then((value) {
+            Future.delayed(const Duration(seconds: 1)).then((value) {
               _editorLoaded = true;
               debugPrint('_editorLoaded $_editorLoaded');
               if (mounted) {

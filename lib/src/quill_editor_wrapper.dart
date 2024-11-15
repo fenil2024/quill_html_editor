@@ -233,7 +233,7 @@ class QuillHtmlEditorState extends State<QuillHtmlEditor> {
           initialSourceType: SourceType.html,
           height: _currentHeight,
           onPageStarted: (s) {
-            Future.delayed(const Duration(seconds: 1)).then((value) {
+            Future.delayed(const Duration(milliseconds: 200)).then((value) {
               _editorLoaded = false;
             });
           },
